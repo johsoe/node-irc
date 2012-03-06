@@ -17,7 +17,7 @@ var modulehandler = new mh.ModuleHandler( bot );
 
 // Auth in Q
 bot.on('motd', function(motd) {
-	bot.say( 'Q@CServe.quakenet.org', util.log('AUTH %s %s', pm.qnet.quser, pm.qnet.qpass) );
+	bot.say( 'Q@CServe.quakenet.org', util.format('AUTH %s %s', pm.qnet.quser, pm.qnet.qpass) );
 	bot.send( 'MODE',  nick, '+x');
 });
 
