@@ -67,8 +67,6 @@ ModuleHandler.prototype.loadPlugins = function() {
 		if(text === "reload") {
 			self.bot.say( from, "Reloading plugins..." );
 
-			self.elcapitan = from;
-
 			self.loadPlugins();
 			
 			self.bot.say( from, "Done." );

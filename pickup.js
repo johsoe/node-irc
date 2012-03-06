@@ -62,11 +62,11 @@ Pickup.prototype.msgListener = function( from, to, message ) {
 Pickup.prototype.isWhore = function( nick ) {
 	var self = this;
 	
-	if( !self.bot.chans[ self.privchannel ] )
+	if( !self.bot.chanData( self.privchannel ) )
 		return;
 	
     //var channel = self.bot.chans[ self.privchannel ];
-    if ( 'string' == typeof self.bot.chans[ self.privchannel ].users[ nick ] ) {
+    if ( 'string' == typeof self.bot.chanData( self.privchannel ).users[ nick ] ) {
         return true;
     }
 
@@ -79,13 +79,13 @@ Pickup.prototype.isCreme = function( nick ) {
 	
 
 
-	if( !self.bot.chans[ "#Fromage&champagne" ] )
+	if( !self.bot.chanData( "#Fromage&champagne" ) )
 		return;
 	
 
 
     //var channel = self.bot.chans[ self.privchannel ];
-    if ( 'string' == typeof self.bot.chans[ "#Fromage&champagne" ].users[ nick ] ) {
+    if ( 'string' == typeof self.bot.chanData( "#Fromage&champagne" ).users[ nick ] ) {
         return true;
     }
 
