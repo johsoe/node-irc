@@ -18,7 +18,7 @@ function Commands( botref ) {
 			self.decide( from, to, message );
 		}
 		
-		if( message.indexOf("men hvad synes Preben?") === 0 )	{
+		if( message.toLowerCase().indexOf("men hvad synes preben?") === 0 )	{
 			self.synes( from, to, message );
 		}
 		

@@ -62,7 +62,7 @@ Pickup.prototype.msgListener = function( from, to, message ) {
 Pickup.prototype.isWhore = function( nick ) {
 	var self = this;
 	
-	if( !self.bot.chanData( self.privchannel ) )
+	if( !self.bot.chanData( self.privchannel  ) )
 		return;
 	
     //var channel = self.bot.chans[ self.privchannel ];

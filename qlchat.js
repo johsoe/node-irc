@@ -19,9 +19,29 @@ function QLChat( botref ) {
 	self.sessionKey = '';
 	self.bot = botref;
 	self.xaid = "";
+
+	self.gamestates = {
+		"PRE_GAME" : "Warmup",
+		"IN_PROGRESS" : "In progress"
+	};
 	
+	self.locations = {
+		"44" : "Moscow",
+		"32" : "Warsaw",
+		"39" : "Bucharest", 
+		"29" : "Stockholm",
+		"28" : "Madrid",
+		"20" : "Paris",
+		"19" : "Maidenhead (UK)",
+		"18" : "Frankfurt",
+		"17" : "Amsterdam"
+	};
 	
-	self.bot.on('message#Fromage&champagne', function(from, message) {
+	self.bot.on('message', function(from, to, message) {
+		
+		if( to !== '#Fromage&champagne')
+			return;
+
 		var cmd = message.split(' ')[0];
 		var params = message.split(' ').splice(1);
 
@@ -31,10 +51,21 @@ function QLChat( botref ) {
 			self.cl.sendMessage( nick, '<'+from+'> ' + params.splice(1).join('') );
 		}
 
+		if( cmd === '.e' ) {
+			var nick = params[0];
+
+			self.getELOToIRC( nick );
+		}
+
 		if( cmd === 'track' ) {
 			var nick = params[0]
 
 			var user = self.cl.findUserByName( nick );
+
+			if( !user ) {
+				self.bot.say('#Fromage&champagne', 'kunne ikke finde ' + nick + ' :(');
+				return;
+			}
 
 			if( !user.isOnline() ) {
 				self.bot.say( '#Fromage&champagne', nick + ' er offline' );
@@ -47,10 +78,12 @@ function QLChat( botref ) {
 			}
 
 			var userstatus = JSON.parse( user.status() );
-
+			/*
 			console.log('userstatus --> ', userstatus);
 
 			self.bot.say( '#Fromage&champagne', nick + 'spiller på ' + userstatus.PUBLIC_ID );
+			*/
+			self.getMatchDetails( userstatus.SERVER_ID, nick );
 		}
 	});
 	
@@ -68,9 +101,13 @@ QLChat.prototype.setupXMPP = function() {
     	'port' 		: 5222
     });
 
+	self.cl.on('online', function() {
+		console.log('QLChat online!');
+	});
+
     self.cl.on('message', function( user, message ) {
     	self.onMessage( user, message );
-    	console.log('QLChat received message from --> ', user, message);
+    	//console.log('QLChat received message from --> ', user, message);
     });
 
     self.cl.on('status', function( user ) {
@@ -115,6 +152,38 @@ QLChat.prototype.getELO = function( player, to ) {
 		});
 	});
 }
+
+QLChat.prototype.getELOToIRC = function( player ) {
+	var self = this;
+
+	var options = {
+	  host: 'qlranks.com',
+	  port: 80,
+	  path: '/api.aspx?nick='+player,
+	  method: 'GET'
+	};
+
+	var qlRanksRequest = http.get(options, function(res) {
+
+		var data = [];
+		
+		res.on('data', function(chunk) {
+			data.push( chunk );
+		});
+
+		res.on('end', function() {
+			data = data.join('');
+
+			data = JSON.parse( data );
+
+			var msg = util.format('DUEL: %d\r\nTDM: %d\r\nCA: %d', data.players[0].duel.elo, data.players[0].tdm.elo, data.players[0].ca.elo);
+			
+			self.bot.say( '#Fromage&champagne', msg );
+
+		});
+	});
+}
+
 
 QLChat.prototype.sendIRCMessage = function( user, message ) {
 	var self = this;
@@ -214,6 +283,70 @@ QLChat.prototype.loginCheck = function( ) {
 	
 	loginCheckRequest.end();
 	
+}
+
+QLChat.prototype.getMatchDetails = function( serverid, nick ) {
+
+	var self = this;
+
+	var options = {
+	  host: 'www.quakelive.com',
+	  port: 80,
+	  path: '/browser/details?_='+new Date().getTime()+'&ids='+serverid,
+	  method: 'GET'
+	};
+	
+	var matchRequest = http.get(options, function(res) {
+		var data = [];
+
+		res.on('data', function(chunk) {
+			data.push( chunk );
+		});
+		
+		res.on('end', function() {
+			//console.log('data: ' + data);
+			
+			if( new String( data ).match( /503 Service Unavailable/i ) ) {
+				return;
+			}
+			
+			try {
+				data = JSON.parse( data );
+			} catch(err) {
+				// do something? :DDDD
+				return;
+			}
+			
+			data = data[0];
+			
+			if(!data)
+				return;
+			
+			var gameinfo = data.game_type_title + " ";
+			var gamestate = (typeof self.gamestates[ data.g_gamestate ] === 'string') ? self.gamestates[ data.g_gamestate ] : data.g_gamestate;
+			var location = (typeof self.locations[ data.location_id ] === 'string') ? self.locations[ data.location_id ] : data.location_id;
+			var specs;
+
+			if( data.num_clients > data.num_players )
+				specs = data.num_clients - data.num_players;
+
+			var msg = util.format(
+				'%s spiller %s (%s) på %s - %d/%d (%d specs) i %s', 
+				nick,
+				data.game_type_title,
+				gamestate,
+				data.map_title,
+				data.num_players,
+				data.max_clients,
+				specs,
+				location
+			);
+			
+			//console.log( gameinfo );
+			self.bot.say( '#Fromage&champagne', msg );
+			
+		});
+	});
 }
 
 QLChat.prototype.login = function( ) {
