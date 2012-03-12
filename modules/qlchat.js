@@ -3,10 +3,10 @@ var util 	= require('util');
 var http 	= require('http');
 var query	= require('querystring');
 var https 	= require('https');
-var pm 		= require('./passwordmanager')
+var pm 		= require('./../passwordmanager')
 //var junction = require('junction');
-var User 	= require('./johsoe-xmpp/user');
-var Client 	= require('./johsoe-xmpp/client');
+var User 	= require('./../johsoe-xmpp/user');
+var Client 	= require('./../johsoe-xmpp/client');
 
 exports.init = function( bot ) {
 	return new QLChat( bot );

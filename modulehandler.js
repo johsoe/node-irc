@@ -8,14 +8,14 @@ function ModuleHandler( bot ) {
 	self.bot = bot;
 	
 	self.plugins = [
-		"./quakelive",
-		"./greeter",
-		"./pickup",
-		"./commands",
-		"./quakelink",
-		"./spotify",
-		"./fredrik",
-		"./qlchat"
+		"./modules/quakelive",
+		"./modules/greeter",
+		"./modules/pickup",
+		"./modules/commands",
+		"./modules/quakelink",
+		"./modules/spotify",
+		"./modules/fredrik",
+		"./modules/qlchat"
 	];
 
 	self.loadedplugins = [];

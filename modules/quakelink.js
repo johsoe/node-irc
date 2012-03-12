@@ -1,6 +1,6 @@
 var https = require('https'),
 	http  = require('http'),
-	pm	  = require('./passwordmanager'),
+	pm	  = require('./../passwordmanager'),
 	url   = require('url');
 
 exports.Quakelink = Quakelink;

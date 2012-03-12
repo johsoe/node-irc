@@ -13,7 +13,7 @@ function Greeter( botref ) {
 	self.bot = botref;
 	
 	self.options = {
-		'filename' : 'greetings.json',
+		'filename' : 'modules/greetings.json',
 		//'channel' : '#quakelive.NO-TARD-ZONE'
 		'channel' : '#Fromage&champagne'
 	};
