@@ -1,6 +1,7 @@
 
 var util 	= require('util');
 var http 	= require('http');
+var query	= require('querystring');
 var https 	= require('https');
 var pm 		= require('./passwordmanager')
 //var junction = require('junction');
@@ -54,7 +55,10 @@ function QLChat( botref ) {
 		if( cmd === '.e' ) {
 			var nick = params[0];
 
-			self.getELOToIRC( nick );
+			if( !nick )
+				nick = from;
+
+			self.getELOToIRC( query.escape(nick) );
 		}
 
 		if( cmd === 'track' ) {
@@ -176,7 +180,7 @@ QLChat.prototype.getELOToIRC = function( player ) {
 
 			data = JSON.parse( data );
 
-			var msg = util.format('DUEL: %d\r\nTDM: %d\r\nCA: %d', data.players[0].duel.elo, data.players[0].tdm.elo, data.players[0].ca.elo);
+			var msg = util.format('\u0002DUEL\u0002: %d   \u0002TDM\u0002: %d   \u0002CA\u0002: %d', data.players[0].duel.elo, data.players[0].tdm.elo, data.players[0].ca.elo);
 			
 			self.bot.say( '#Fromage&champagne', msg );
 
