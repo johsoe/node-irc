@@ -8,7 +8,7 @@ var irc 	= require('./lib/irc');
 var nick = 'Preben';
 var bot = new irc.Client('se.quakenet.org', nick, {
     debug: false,
-    channels: ["#4j", "#playquake", "#quakelive.dk", "#quakelive.NO-TARD-ZONE", "#qlpickup.eu", "#tdmpickup", "#ensammaonanister", "#wh0reunit", "#Fromage&champagne"]
+    channels: pm.channels
     //channels: ["#4j"]
 });
 
