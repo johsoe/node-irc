@@ -45,7 +45,7 @@ Greeter.prototype.setupListeners = function() {
 	});
 	
 	self.bot.on('pm', function(nick, message) {
-		if('string' == typeof self.bot.chanData( self.options.channel ).users[ nick ] ) {
+		if( self.bot.chanData( self.options.channel ) && 'string' == typeof self.bot.chanData( self.options.channel ).users[ nick ] ) {
 			
 			var cmd = message.substring(0, message.indexOf(" "));
 			
