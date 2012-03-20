@@ -1,4 +1,5 @@
-
+var util = require('util');
+var http = require('http');
 
 exports.Commands = Commands;
 
@@ -42,6 +43,10 @@ function Commands( botref ) {
 		
 		if( message === "opa opa" ) {
 			self.bot.say( to, "http://www.youtube.com/watch?v=Dqzrofdwi-g&feature=player_detailpage#t=72s" );
+		}
+
+		if( message === 'streams' ) {
+			self.streams( from, to, message );
 		}
 	});
 	
@@ -140,4 +145,40 @@ Commands.prototype.synes = function( from, to, message ) {
 		self.bot.say( to, "Haha! Synes da det lyder dejligt! :))))" );
 };
 
+Commands.prototype.streams = function( from , to, message ) {
+	var self = this;
+	
+	var options = {
+	  host: 'liveql.com',
+	  port: 80,
+	  method: 'GET'
+	};
+
+	var qlRanksRequest = http.get(options, function(res) {
+
+		var data = [];
+		
+		res.on('data', function(chunk) {
+			data.push( chunk );
+		});
+
+		res.on('end', function() {
+			data = data.join('');
+
+			var streams = data.split('<\/option>');
+
+			streams = streams.slice( 1, streams.length-1 );
+
+			for( var i in streams ) {
+				if( streams[i].indexOf('class="off"') > 0 || streams[i].indexOf('++++++++++') > 0 || streams[i].indexOf('class') == -1)
+					continue;
+
+				var url = streams[i].match(/value="(.*?)">/)[1];
+				var name = streams[i].substring( streams[i].indexOf('>')+1 );
+
+				self.bot.say( to, util.format('\u0002%s\u0002 -> http://liveql.com?s=%s', name, url) );
+			}
+		});
+	});	
+};
 
