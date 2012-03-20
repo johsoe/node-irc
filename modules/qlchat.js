@@ -121,6 +121,10 @@ QLChat.prototype.setupXMPP = function() {
     self.cl.on('userOnline', function( user ) {
     	//console.log('QLChat received online user event --> ', user);
     });
+
+    self.cl.on('offline', function() {
+    	util.log('qlchat is offline!');
+    });
     
 }
 
@@ -311,28 +315,29 @@ QLChat.prototype.getMatchDetails = function( serverid, nick ) {
 			//console.log('data: ' + data);
 			
 			if( new String( data ).match( /503 Service Unavailable/i ) ) {
+				console.log('qlchat.getMatchDetails --> 503 Service Unavailable');
 				return;
 			}
 			
 			try {
 				data = JSON.parse( data );
 			} catch(err) {
-				// do something? :DDDD
+				console.log('JSON PARSE ERROR --> ' , err);
 				return;
 			}
 			
 			data = data[0];
 			
-			if(!data)
+			if(!data) {
+				console.log('qlchat.getMatchDetails --> couldnt find data');
 				return;
+			}
+				
 			
 			var gameinfo = data.game_type_title + " ";
 			var gamestate = (typeof self.gamestates[ data.g_gamestate ] === 'string') ? self.gamestates[ data.g_gamestate ] : data.g_gamestate;
 			var location = (typeof self.locations[ data.location_id ] === 'string') ? self.locations[ data.location_id ] : data.location_id;
-			var specs;
-
-			if( data.num_clients > data.num_players )
-				specs = data.num_clients - data.num_players;
+			var specs = ( data.num_clients > data.num_players ) ? (data.num_clients - data.num_players) : 0;
 
 			var msg = util.format(
 				'%s spiller %s (%s) på %s - %d/%d (%d specs) i %s', 
