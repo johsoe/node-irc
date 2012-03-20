@@ -22,6 +22,7 @@ bot.on('motd', function(motd) {
 });
 
 // Catch exceptions
-process.on('uncaughtException', function (err) {
-    console.log('uncaughtException bobbled up --> ', err);
+process.on('uncaughtException', function ( err ) {
+	util.log( util.format('uncaughtException bobbled up --> %s', err) );
+	util.log( err.stack );
 });
