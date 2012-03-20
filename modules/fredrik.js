@@ -138,7 +138,7 @@ Stock.prototype.saveFile = function( stock, nick ) {
 			stocks.push( stock );
 			var jsondata = JSON.stringify( stocks );
 			
-			fs.writeFile('stock.json', jsondata, function (err) {
+			fs.writeFile('modules/stock.json', jsondata, function (err) {
 				if (err) throw err;
 				
 				//console.log('It\'s saved!');
