@@ -40,6 +40,7 @@ function QLChat( botref ) {
 	
 	self.bot.on('message', function(from, to, message) {
 		
+
 		if( to !== '#Fromage&champagne')
 			return;
 
@@ -153,7 +154,7 @@ QLChat.prototype.getELO = function( player, to ) {
 
 			data = JSON.parse( data );
 
-			var msg = util.format('DUEL: %d\r\nTDM: %d\r\nCA: %d', data.players[0].duel.elo, data.players[0].tdm.elo, data.players[0].ca.elo);
+			var msg = util.format('DUEL: %d TDM: %d CA: %d', data.players[0].duel.elo, data.players[0].tdm.elo, data.players[0].ca.elo);
 			
 			self.cl.sendMessage( to, msg );
 
@@ -184,7 +185,7 @@ QLChat.prototype.getELOToIRC = function( player ) {
 
 			data = JSON.parse( data );
 
-			var msg = util.format('\u0002DUEL\u0002: %d   \u0002TDM\u0002: %d   \u0002CA\u0002: %d', data.players[0].duel.elo, data.players[0].tdm.elo, data.players[0].ca.elo);
+			var msg = util.format('\u0002DUEL\u0002: %d (rank %d) \u0002TDM\u0002: %d (rank %d) \u0002CA\u0002: %d (rank %d)', data.players[0].duel.elo, data.players[0].duel.rank, data.players[0].tdm.elo, data.players[0].tdm.rank, data.players[0].ca.elo, data.players[0].ca.rank);
 			
 			self.bot.say( '#Fromage&champagne', msg );
 
@@ -339,8 +340,36 @@ QLChat.prototype.getMatchDetails = function( serverid, nick ) {
 			var location = (typeof self.locations[ data.location_id ] === 'string') ? self.locations[ data.location_id ] : data.location_id;
 			var specs = ( data.num_clients > data.num_players ) ? (data.num_clients - data.num_players) : 0;
 
+			var timeleft;
+
+			// TDM, DUEL - timebased
+			if( data.game_type === 3 ) {
+				var endTime = (data.timelimit * 60) + data.g_levelstarttime;
+				var now = new Date().getTime() / 1000;
+
+				if( now >= endTime )
+					timeleft = "0 mins tilbage :(";
+				
+				else {
+					var minutes = ( endTime - now ) % 60;
+					var seconds = minutes % 60;
+
+					timeleft = minutes + ":" + seconds + " tilbage.";
+					util.log( "tid: " + minutes + ":" + seconds );
+				}
+
+					
+			}
+
+			// CA - roundbased
+			else if( data.game_type === 4 ) {
+				var roundsleft = (data.g_redscore >= data.g_bluescore) ? data.roundlimit - data.g_redscore : data.roundlimit - data.g_bluescore;
+				timeleft = roundsleft + " runder tilbage. ";
+				util.log( "tid: " + timeleft );
+			}
+
 			var msg = util.format(
-				'%s spiller %s (%s) på %s - %d/%d (%d specs) i %s', 
+				'%s spiller \u0002%s\u0002 (%s) på \u0002%s\u0002 - \u0002%d\u0002/%d (%d specs) i %s med %s', 
 				nick,
 				data.game_type_title,
 				gamestate,
@@ -348,7 +377,8 @@ QLChat.prototype.getMatchDetails = function( serverid, nick ) {
 				data.num_players,
 				data.max_clients,
 				specs,
-				location
+				location,
+				timeleft
 			);
 			
 			//console.log( gameinfo );
