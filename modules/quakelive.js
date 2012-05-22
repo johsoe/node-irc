@@ -212,6 +212,38 @@ Quakelive.prototype.parseLastGame = function( data, options ) {
 	/* Pretty print JSON data */
 	switch(options.mode) {
 		
+		case "dom":
+			var msg = "";
+			var playerdata;
+			
+			// check if dude was on red team
+			for(var i in data.RED_SCOREBOARD) if( data.RED_SCOREBOARD[i].PLAYER_NICK.toLowerCase() === options.nick.toLowerCase() ) {
+				playerdata = data.RED_SCOREBOARD[i];
+			};
+			// check if dude was on blue team
+			for(var i in data.BLUE_SCOREBOARD) if( data.BLUE_SCOREBOARD[i].PLAYER_NICK.toLowerCase() === options.nick.toLowerCase() ) {
+				playerdata = data.BLUE_SCOREBOARD[i];
+			};
+			
+			// TODO: player was SPEC
+			if( !playerdata )
+				return;
+			/*
+			msg = data.GAME_TIMESTAMP_NICE + " ago on " + data.MAP_NAME + " with " + playerdata.ACCURACY + "% accuracy on team " + playerdata.TEAM + " | ";
+			msg += "Red " + data.TSCORE0 + ":" + data.TSCORE1 + " Blue | ";
+			msg += "Damage done: " + playerdata.DAMAGE_DEALT + " | ";
+			msg += "RL: " + playerdata.RL_A + "%("+playerdata.RL+" kills) LG: " + playerdata.LG_A + "%("+playerdata.LG+" kills) RG: " + playerdata.RG_A + "%("+playerdata.RG+" kills)";
+			*/
+			msg = util.format(
+				'%s ago on \u0002%s\u0002 with %s%% accuracy on %s team | Red \u0002%d\u0002:\u0002%d\u0002 Blue | Captures: %d Defends: %d | RL: \u0002%d%%\u0002(%d kills) LG: \u0002%d%%\u0002(%d kills) RG: \u0002%d%%\u0002(%d kills)',
+				data.GAME_TIMESTAMP_NICE, data.MAP_NAME, playerdata.ACCURACY, playerdata.TEAM, data.TSCORE0, data.TSCORE1, playerdata.CAPTURES, playerdata.DEFENDS, 
+				playerdata.RL_A, playerdata.RL, playerdata.LG_A, playerdata.LG, playerdata.RG_A, playerdata.RG
+			);
+
+			self.bot.say( options.channel, msg );
+			
+			break;
+
 		// %s siden på %s med %s%% accuracy | Red %s - %s Blue | Damage: (%s given/%s taken) | RL: %s%%(%s) LG: %s%%(%s) RG: %s%%(%s) "
 		case "ca":
 			var msg = "";
