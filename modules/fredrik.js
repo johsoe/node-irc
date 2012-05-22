@@ -17,6 +17,8 @@ var Stock = function( bot ) {
 	
 	self.bot = bot;
 	
+	self.filepath = 'modules/stock.json';
+
 	self.bot.on('pm', function(nick, message) {
 		if( message == 'fisk' ) {
 			self.getCommodity( nick );
@@ -120,7 +122,7 @@ Stock.prototype.getOpen = function( stock, nick ) {
 Stock.prototype.saveFile = function( stock, nick ) {
 	var self = this;
 	
-	fs.readFile('stock.json', function (err, data) {
+	fs.readFile( self.filepath , function (err, data) {
 		if (err) throw err;
 		
 		var stocks = JSON.parse( data );
@@ -138,7 +140,7 @@ Stock.prototype.saveFile = function( stock, nick ) {
 			stocks.push( stock );
 			var jsondata = JSON.stringify( stocks );
 			
-			fs.writeFile('modules/stock.json', jsondata, function (err) {
+			fs.writeFile( self.filepath , jsondata, function (err) {
 				if (err) throw err;
 				
 				//console.log('It\'s saved!');
