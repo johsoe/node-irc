@@ -111,8 +111,8 @@ Pickup.prototype.updatePlayQuakeTopic = function( channel, topic, nick ) {
 
 	//self.bot.say('rhz', topic);
 
-	// CTF7 [ 0 / 87 ] 
-	var ctf = topic.match( /CTF7 \[ (.*?) \/ 87 \]/ );
+	// CTF8 [ 0 / 88 ] 
+	var ctf = topic.match( /CTF8 \[ (.*?) \/ 88 \]/ );
 
 	if( ctf ) {
 		ctf = ctf[1];
